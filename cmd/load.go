@@ -71,13 +71,15 @@ func load(ctx *cli.Context) error {
 	src := ctx.Args().Get(1)
 	removePassword(metaUri)
 	var r io.ReadCloser
+	var encryptor object.Encryptor
 	if ctx.Args().Len() == 1 {
 		r = os.Stdin
 		src = "STDIN"
 	} else {
 		var ioErr error
 		var fp io.ReadCloser
-		if ctx.String("encrypt-rsa-key") != "" {
+
+		if ctx.String("encrypt-algo") == "aes256gcm-rsa" || ctx.String("encrypt-algo") == "chacha20-rsa" {
 			passphrase := os.Getenv("JFS_RSA_PASSPHRASE")
 			encryptKey := loadEncrypt(ctx.String("encrypt-rsa-key"))
 			if passphrase == "" {
@@ -91,27 +93,38 @@ func load(ctx *cli.Context) error {
 			if err != nil {
 				return fmt.Errorf("parse rsa: %s", err)
 			}
-			encryptor, err := object.NewDataEncryptor(object.NewRSAEncryptor(privKey), ctx.String("encrypt-algo"))
+			encryptor, err = object.NewDataEncryptor(ctx.String("encrypt-algo"), "rsa", object.NewRSAEncryptor(privKey))
 			if err != nil {
 				return err
 			}
-			if _, err := os.Stat(src); err != nil {
-				return fmt.Errorf("failed to stat %s: %s", src, err)
+		} else if ctx.String("encrypt-algo") == "openbao" {
+			openBaoURL := os.Getenv("OPENBAO_URL")
+			totpSecret := os.Getenv("OPENBAO_TOTP_SECRET")
+			if totpSecret == "" {
+				return fmt.Errorf("TOTP secret is required for OpenBao encryption, please provide it using the '--totp-secret' flag")
 			}
-			var srcAbsPath string
-			srcAbsPath, err = filepath.Abs(src)
+			var err error
+			encryptor, err = object.NewDataEncryptor(ctx.String("encrypt-algo"), "openbao", object.NewOpenBaoEncryptor(openBaoURL, totpSecret))
 			if err != nil {
-				return fmt.Errorf("failed to get absolute path of %s: %s", src, err)
+				return fmt.Errorf("failed to initialize OpenBao encryptor: %s", err)
 			}
-			fileBlob, err := object.CreateStorage("file", strings.TrimSuffix(src, filepath.Base(srcAbsPath)), "", "", "")
-			if err != nil {
-				return err
-			}
-			blob := object.NewEncrypted(fileBlob, encryptor)
-			fp, ioErr = blob.Get(filepath.Base(srcAbsPath), 0, -1)
 		} else {
-			fp, ioErr = os.Open(src)
+			return fmt.Errorf("either --encrypt-rsa-key or --encrypt-openbao-url must be specified")
 		}
+		if _, err := os.Stat(src); err != nil {
+			return fmt.Errorf("failed to stat %s: %s", src, err)
+		}
+		var srcAbsPath string
+		srcAbsPath, err := filepath.Abs(src)
+		if err != nil {
+			return fmt.Errorf("failed to get absolute path of %s: %s", src, err)
+		}
+		fileBlob, err := object.CreateStorage("file", strings.TrimSuffix(src, filepath.Base(srcAbsPath)), "", "", "")
+		if err != nil {
+			return err
+		}
+		blob := object.NewEncrypted(fileBlob, encryptor)
+		fp, ioErr = blob.Get(filepath.Base(srcAbsPath), 0, -1)
 		if ioErr != nil {
 			return ioErr
 		}

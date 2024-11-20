@@ -29,7 +29,7 @@ require (
 	github.com/grafana/pyroscope-go v1.0.4
 	github.com/hanwen/go-fuse/v2 v2.1.1-0.20210611132105-24a1dfe6b4f8
 	github.com/hashicorp/consul/api v1.15.2
-	github.com/hashicorp/go-hclog v1.5.0
+	github.com/hashicorp/go-hclog v1.6.3
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.21.12+incompatible
 	github.com/hungys/go-lz4 v0.0.0-20170805124057-19ff7f07f099
 	github.com/jackc/pgx/v5 v5.5.4
@@ -40,16 +40,18 @@ require (
 	github.com/juju/ratelimit v1.0.2
 	github.com/ks3sdklib/aws-sdk-go v1.2.2
 	github.com/l0wl3vel/bunny-storage-go-sdk v0.0.10
-	github.com/mattn/go-isatty v0.0.18
+	github.com/mattn/go-isatty v0.0.20
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/minio/cli v1.24.2
 	github.com/minio/minio v0.0.0-20210206053228-97fe57bba92c
 	github.com/minio/minio-go/v7 v7.0.11-0.20210302210017-6ae69c73ce78
 	github.com/ncw/swift/v2 v2.0.1
+	github.com/openbao/openbao/api/v2 v2.0.1
 	github.com/pingcap/log v1.1.1-0.20221015072633-39906604fb81
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.13.5
 	github.com/pkg/xattr v0.4.9
+	github.com/pquerna/otp v1.3.0
 	github.com/prometheus/client_golang v1.15.1
 	github.com/prometheus/client_model v0.4.0
 	github.com/prometheus/common v0.43.0
@@ -76,7 +78,7 @@ require (
 	golang.org/x/net v0.23.0
 	golang.org/x/oauth2 v0.7.0
 	golang.org/x/sync v0.2.0
-	golang.org/x/sys v0.18.0
+	golang.org/x/sys v0.20.0
 	golang.org/x/term v0.18.0
 	golang.org/x/text v0.14.0
 	google.golang.org/api v0.114.0
@@ -84,6 +86,20 @@ require (
 	gopkg.in/kothar/go-backblaze.v0 v0.0.0-20210124194846-35409b867216
 	pgregory.net/rapid v0.5.3
 	xorm.io/xorm v1.0.7
+)
+
+require (
+	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
+	github.com/cenkalti/backoff/v3 v3.0.0 // indirect
+	github.com/go-jose/go-jose/v3 v3.0.1 // indirect
+	github.com/hashicorp/errwrap v1.1.0 // indirect
+	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
+	github.com/hashicorp/go-secure-stdlib/parseutil v0.1.6 // indirect
+	github.com/hashicorp/go-secure-stdlib/strutil v0.1.2 // indirect
+	github.com/hashicorp/go-sockaddr v1.0.2 // indirect
+	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/ryanuber/go-glob v1.0.0 // indirect
 )
 
 require (
@@ -123,7 +139,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/djherbis/atime v1.0.0 // indirect
 	github.com/dswarbrick/smart v0.0.0-20190505152634-909a45200d6d // indirect
-	github.com/fatih/color v1.13.0 // indirect
+	github.com/fatih/color v1.16.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.1 // indirect
@@ -146,7 +162,7 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/grafana/pyroscope-go/godeltaprof v0.1.8
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0 // indirect
-	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.0 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
@@ -180,7 +196,7 @@ require (
 	github.com/minio/simdjson-go v0.2.1 // indirect
 	github.com/minio/sio v0.2.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/mitchellh/mapstructure v1.4.3 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/montanaflynn/stats v0.5.0 // indirect

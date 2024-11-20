@@ -279,24 +279,43 @@ func createStorage(format meta.Format) (object.ObjectStorage, error) {
 			logger.Warnf("Storage class is not supported by %q, will ignore", format.Storage)
 		}
 	}
-	if format.EncryptKey != "" {
-		passphrase := os.Getenv("JFS_RSA_PASSPHRASE")
-		if passphrase == "" {
-			block, _ := pem.Decode([]byte(format.EncryptKey))
-			// nolint:staticcheck
-			if block != nil && strings.Contains(block.Headers["Proc-Type"], "ENCRYPTED") && x509.IsEncryptedPEMBlock(block) {
-				return nil, fmt.Errorf("passphrase is required to private key, please try again after setting the 'JFS_RSA_PASSPHRASE' environment variable")
+	if format.EncryptAlgo != "" {
+		var encryptor object.Encryptor
+
+		if format.EncryptAlgo == "openbao" {
+			logger.Infof("mario")
+			// Initialize OpenBao encryptor
+			openBaoURL := os.Getenv("OPENBAO_URL")
+			totpSecret := os.Getenv("OPENBAO_TOTP_SECRET")
+			if totpSecret == "" {
+				return nil, fmt.Errorf("TOTP secret is required for OpenBao encryption, please provide it using the '--totp-secret' flag")
 			}
+			encryptor, err = object.NewDataEncryptor(format.EncryptAlgo, "openbao", object.NewOpenBaoEncryptor(openBaoURL, totpSecret))
+			if err != nil {
+				return nil, fmt.Errorf("initialize OpenBao encryptor: %s", err)
+			}
+		} else if format.EncryptAlgo == "aes256gcm-rsa" || format.EncryptAlgo == "chacha20-rsa" {
+			passphrase := os.Getenv("JFS_RSA_PASSPHRASE")
+			if passphrase == "" {
+				block, _ := pem.Decode([]byte(format.EncryptKey))
+				// nolint:staticcheck
+				if block != nil && strings.Contains(block.Headers["Proc-Type"], "ENCRYPTED") && x509.IsEncryptedPEMBlock(block) {
+					return nil, fmt.Errorf("passphrase is required to private key, please try again after setting the 'JFS_RSA_PASSPHRASE' environment variable")
+				}
+			}
+
+			privKey, err := object.ParseRsaPrivateKeyFromPem([]byte(format.EncryptKey), []byte(passphrase))
+			if err != nil {
+				return nil, fmt.Errorf("parse rsa: %s", err)
+			}
+			encryptor, err = object.NewDataEncryptor(format.EncryptAlgo, "rsa", object.NewRSAEncryptor(privKey))
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, fmt.Errorf("unsupported encryption algorithm: %s", format.EncryptAlgo)
 		}
 
-		privKey, err := object.ParseRsaPrivateKeyFromPem([]byte(format.EncryptKey), []byte(passphrase))
-		if err != nil {
-			return nil, fmt.Errorf("parse rsa: %s", err)
-		}
-		encryptor, err := object.NewDataEncryptor(object.NewRSAEncryptor(privKey), format.EncryptAlgo)
-		if err != nil {
-			return nil, err
-		}
 		blob = object.NewEncrypted(blob, encryptor)
 	}
 	return blob, nil
